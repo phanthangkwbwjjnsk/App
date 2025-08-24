@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Higet AimLzyx</title>
+<style>
+  * {box-sizing:border-box;margin:0;padding:0;font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  html,body {height:100%;background:#000;color:#fff;}
+
+  .stage {
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow:hidden;
+  }
+  video#bg {
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    object-fit:cover;
+    z-index:-2;
+  }
+
+  .overlay-dark {
+    position:absolute;inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.4) 100%);
+    pointer-events:none;
+    z-index:-1;
+  }
+
+  .card {
+    width:min(860px, 92%);
+    max-width:920px;
+    background: linear-gradient(180deg, rgba(255,30,30,0.12), rgba(0,0,0,0.15));
+    border:3px solid rgba(255,0,0,0.8);
+    border-radius:18px;
+    box-shadow: 0 10px 30px rgba(255,0,0,0.08), 0 6px 18px rgba(0,0,0,0.6);
+    overflow:hidden;
+    position:relative;
+    backdrop-filter: blur(2px);
+  }
+
+  .card .art {position:absolute;inset:0;background: transparent;}
+  .card .art-mask {position:absolute;inset:0;background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.5));}
+
+  .card .content {
+    position:relative;padding:22px 28px 26px 28px; z-index:3;
+    display:flex;flex-direction:column;gap:12px;
+  }
+
+  .title {display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .title h1 {
+    font-size:34px;margin:0;letter-spacing:1px;
+    color:#ff49d1;font-weight:700;
+    text-shadow: 0 2px 12px rgba(255,74,185,0.15), 0 0 20px rgba(255,0,120,0.06);
+  }
+
+  .btns {display:flex;gap:12px;}
+  .btn {
+    background: linear-gradient(180deg,#c41b1b,#b10f0f);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:10px 14px;border-radius:8px;color:#fff;font-weight:600;
+    box-shadow: 0 6px 12px rgba(177,15,15,0.18);
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s;
+  }
+  .btn:active{transform:translateY(1px) scale(.997);}
+  .btn.secondary {background: linear-gradient(180deg,#ff3b3b,#cc1a1a);}
+
+  .sep {height:2px;background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.0)); margin:6px 0 4px 0;border-radius:6px}
+
+  .opts {display:flex;flex-direction:column;gap:14px;padding:6px;margin-top:6px;}
+  .opt {
+    display:flex;align-items:center;gap:12px;
+    background: rgba(255,255,255,0.035);
+    border-radius:12px;padding:10px 12px;
+  }
+  .opt input[type="checkbox"] {width:22px;height:22px;border-radius:6px;accent-color:#ff2d6f;}
+  .opt label {font-weight:600;color:#fff;text-shadow: 0 1px 0 rgba(0,0,0,0.6);}
+
+  .small {opacity:0.9;font-size:13px;color:#fff;}
+  .bottom-bar {display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px;}
+  .contact-note {font-size:13px;color:#ffe3e9;opacity:0.95}
+
+  .modal {
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.96);
+    background:#111;border:2px solid rgba(255,0,0,0.85);min-width:320px;
+    padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.7);
+    z-index:9999;display:none;
+  }
+  .modal.show{display:block;animation:pop .14s ease forwards}
+  @keyframes pop {from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  .modal h3 {color:#ff7ecf;margin-bottom:8px}
+  .modal p{color:#fff;margin-bottom:12px}
+  .modal .link {display:block;background:rgba(255,255,255,0.04);padding:10px;border-radius:8px;margin-bottom:10px;word-break:break-all}
+  .modal .actions {display:flex;gap:8px;justify-content:flex-end}
+
+  .toast {
+    position:fixed;right:18px;bottom:18px;background:rgba(0,0,0,0.7);
+    padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+    color:#fff;display:none;z-index:10001;
+  }
+
+  @media (max-width:520px){
+    .title h1 {font-size:22px}
+    .btn {padding:8px 10px;font-size:13px}
+    .card {border-radius:14px}
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <video autoplay muted loop id="bg">
+      <source src="LogoBa.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay-dark"></div>
+
+    <div class="card" role="region" aria-label="Aimlock UI">
+      <div class="art"></div>
+      <div class="art-mask"></div>
+
+      <div class="content">
+        <div class="title">
+          <h1>AimLock Newsetting🧃</h1>
+          <div class="btns">
+            <button class="btn" id="btn-feature">Chức Năng</button>
+            <button class="btn secondary" id="btn-contact">Liên Hệ</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="opts" id="options-list">
+          <div class="opt">
+            <input type="checkbox" id="cb-recoil" />
+            <label for="cb-recoil">RECOIL</label>
+          </div>
+          <div class="opt">
+            <input type="checkbox" id="cb-focus" />
+            <label for="cb-focus">AimFov</label>
+          </div>
+          <div class="opt">
+            <input type="checkbox" id="cb-bypass" />
+            <label for="cb-bypass">Bypass</label>
+          </div>
+        </div>
+
+        <div class="bottom-bar">
+          <div class="contact-note small">Mua file: liên hệ Admin <strong>PhThangrealife</strong></div>
+          <div class="small">zalo 0977885342</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="modal-contact">
+      <h3>Mua File Hoặc Vô Box Ibox Zalo 0977885342</h3>
+      <p>Liên hệ Admin để mua file và hỗ trợ: <strong>PhThangrealife</strong></p>
+      <div class="link">Tên: PhThangrealife<br>Link mua: https://linkbio.co/phthangrealife2850</div>
+      <div class="actions">
+      <div class="link">Sdt:0977885342<br></div>
+        <button class="btn" id="">Sao chép</button>
+        <button class="btn secondary" id="openLinkBtn">Mở Link</button>
+        <button class="btn" id="closeModal">Đóng</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Đã thực hiện</div>
+  </div>
+
+<script>
+  const cbRecoil = document.getElementById('cb-recoil');
+  const cbFocus = document.getElementById('cb-focus');
+  const cbBypass = document.getElementById('cb-bypass');
+  const toast = document.getElementById('toast');
+
+  function showToast(text, ms = 1500){
+    toast.textContent = text;
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+    setTimeout(()=> { toast.style.opacity = '0'; }, ms - 200);
+    setTimeout(()=> { toast.style.display = 'none'; }, ms);
+  }
+
+  cbRecoil.addEventListener('change', ()=> {showToast(cbRecoil.checked ? 'RECOIL: BẬT' : 'RECOIL: TẮT');});
+  cbFocus.addEventListener('change', ()=> {showToast(cbFocus.checked ? 'AimFov: BẬT' : 'AimFov: TẮT');});
+  cbBypass.addEventListener('change', ()=> {showToast(cbBypass.checked ? 'Bypass: BẬT' : 'Bypass: TẮT');});
+
+  const btnContact = document.getElementById('btn-contact');
+  const modal = document.getElementById('modal-contact');
+  const closeModal = document.getElementById('closeModal');
+  const copyBtn = document.getElementById('copyBtn');
+  const openLinkBtn = document.getElementById('openLinkBtn');
+
+  btnContact.addEventListener('click', ()=> {modal.classList.add('show');});
+  closeModal.addEventListener('click', ()=> {modal.classList.remove('show');});
+  copyBtn.addEventListener('click', ()=> {
+    const txt = 'Admin: PhThangrealife - Link mua: https://linkbio.co/phthangrealife2850';
+    navigator.clipboard?.writeText(txt).then(()=> {showToast('');})
+    .catch(()=> {showToast('');});
+  });
+  openLinkBtn.addEventListener('click', ()=> {window.open('https://linkbio.co/phthangrealife2850','_blank');});
+  document.getElementById('btn-feature').addEventListener('click', ()=> {showToast('File Imz Ipa Menu Cần Gì Lh Admin 0977885342 Phthangrealife');});
+  document.addEventListener('keydown', (e)=>{if(e.key === 'Escape'){ modal.classList.remove('show'); }});
+</script>
+</body>
+</html>
